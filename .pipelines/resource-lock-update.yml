@@ -1,0 +1,70 @@
+trigger: none
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - template: ./Locks.variables.yml
+
+parameters:
+  - name: SCOPE
+    displayName: Select the Scope
+    type: string
+    values:
+    - Subscription
+    - ResourceGroup
+    - Resource
+
+stages:
+  - stage: update
+    displayName: 'Update Locks'
+    jobs:
+      - job: update_locks
+        displayName: 'Update Locks at scope'
+        steps:
+        - task: UsePythonVersion@0
+          displayName: 'Use Python verison 3.8'
+          inputs:
+            versionSpec: '3.8'
+        - script: pip install -r requirements.txt
+          displayName: 'Install Python Modules'
+        - task: AzureCLI@2
+          displayName: 'Download Excel File'
+          inputs:
+            azureSubscription: $(SERVICECONNECTION)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              export ARM_ACCESS_KEY=$(ARM_ACCESS_KEY)
+              export SA_NAME=$(SA_NAME)
+              export CONTAINER_NAME=$(CONTAINER_NAME)
+              az storage blob download --account-name $(SA_NAME) --container-name "$(CONTAINER_NAME)/Update-$(DATE)" --account-key $(ARM_ACCESS_KEY) --name "$(FILENAME)" --file "$(System.DefaultWorkingDirectory)/locks.xlsx"
+        - task: AzureCLI@2
+          displayName: 'Update'
+          inputs:
+            azureSubscription: $(SERVICECONNECTION)
+            scriptType: bash
+            workingDirectory: $(System.DefaultWorkingDirectory)
+            scriptLocation: inlineScript
+            inlineScript: |
+              export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+              export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+              export ARM_TENANT_ID=$(ARM_TENANT_ID)
+              python3 main.py "Azure" "update" ${{ variables.SCOPE }}
+        - task: AzureCLI@2
+          displayName: 'Upload Excel File'
+          inputs:
+            azureSubscription: $(SERVICECONNECTION)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              export ARM_ACCESS_KEY=$(ARM_ACCESS_KEY)
+              export SA_NAME=$(SA_NAME)
+              export CONTAINER_NAME=$(CONTAINER_NAME)
+              today=`date +%F`
+              ls -ltrh
+              az storage blob upload --account-name $(SA_NAME) --container-name "$(CONTAINER_NAME)/Audit-$today" --account-key $(ARM_ACCESS_KEY) --file "$(Build.SourcesDirectory)/locks.xlsx" --name "${{ variables.SCOPE }}-$(FILENAME)" --overwrite true
+        
+        
