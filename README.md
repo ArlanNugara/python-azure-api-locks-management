@@ -21,7 +21,7 @@ Coming Soon..
 
 ## Import GitHub repository
 
-The Azure tag Management GitHub repository is public hence no authorization is required. Clone URL: `https://github.com/ArlanNugara/python-azure-api-locks-management.git`
+The Azure Lock Management GitHub repository is public hence no authorization is required. Clone URL: `https://github.com/ArlanNugara/python-azure-api-locks-management.git`
 
 Check here for [Importing a repo](https://docs.microsoft.com/en-us/azure/devops/repos/git/import-git-repository?view=azure-devops#import-into-a-new-repo)
 
@@ -34,7 +34,7 @@ For the pipeline to authenticate and connect to Azure we need to create an Azure
 * In Azure Portal navigate to **Azure Active Directory**
 * Click on **App registrations**
 * Click on **New registration**
-* Name the application (e.g. **Tags_MGMT_SP**)
+* Name the application (e.g. **Locks_MGMT_SP**)
 * Click **Register**
 * Once the App registration is created, in the **Overview**' note the **Application ID**
 * Under **Manage** click on **Certificates & Secrets**
@@ -45,7 +45,7 @@ For the pipeline to authenticate and connect to Azure we need to create an Azure
 ### Assign Permission to Service Principle
 
 * In Azure portal navigate to **Subscriptions**
-* Select the subscription at which Azure Tag Management will run
+* Select the subscription at which Azure Locks Management will run
 * Go to **Access Control (IAM)**
 * Click on **Add Role Assignment**
 * Select **User Access Administrator** and **Reader** and click on **Next** button
@@ -101,7 +101,7 @@ Note: Repeat the above steps if you have more than one subscription.
 
 ### Edit Pipeline variables File
 
-* Open **Tags.variables.yml** file in **.pipelines** directory
+* Open **Locks.variables.yml** file in **.pipelines** directory
 * Replace `<VariableGroup>` with the variable group name created
 * Replace `<ServiceConnection>` with the service connection name created
 * Replace `<ReportsFileNamePrefix>` with the prefix of file name you want for reports without spaces(e.g `All-Locks` or `Locks-Report` etc)
@@ -114,7 +114,7 @@ Note: Repeat the above steps if you have more than one subscription.
 * Select **Azure Repos Git**
 * Select the repository you imported
 * Select **Existing Azure Pipelines YAML file**
-* Select the repository branch and select the Tags Report Pipeline file path - **/.pipelines/resource-lock-report.yml**
+* Select the repository branch and select the Locks Report Pipeline file path - **/.pipelines/resource-lock-report.yml**
 * Click on **Continue** button
 * Click on **Save** button from **Run** Dropdown menu.
 
@@ -136,12 +136,12 @@ This is the general idea how the process works within the Pipeline and Python
 * Format and inserts the data into Excel Sheet.
 * Upload the excel file to Azure Storage Account Container.
 
-![image](./images/get-tags.png)
+![image](./images/get-locks.png)
 
 ## Running the Pipeline
 
 * Click on **Pipelines**
-* Select the Azure Tags Report Pipeline
+* Select the Azure Locks Report Pipeline
 * Click **Run pipeline**
 
 Note: For first time user the Pipeline will require authorization for accessing the Variable Group. Authorize the same while runnign the pipeline for the first time.
