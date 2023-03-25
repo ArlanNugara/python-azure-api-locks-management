@@ -158,4 +158,47 @@ This process updates locks for any scope i.e Subscription or Resource group or R
 
 ## Update Locks process summary
 
-Coming Soon..
+This is the general idea how the process works in Pipeline and Python.
+
+* Download the excel file created in [get azure locks](#get-azure-locks) process.
+* Edit the excel file to match your required locks. The value is in json format.
+* Upload the file to the same storage account. You can change the name of the excel file.
+* Start the pipeline with the file name and date as variable while selecting the scope - Subscription or ResourceGroup or Resource.
+* The Pipeline :
+
+    * Download the file from storage account.
+
+    * Check for column values for updates
+
+    * Login to Azure using the Service Principle credentials to generate the API tokens.
+
+    * Query Azure API to patch the updates for updated locks.
+
+![image](./images/update-locks.png)
+
+### Update the Excel Sheet
+
+* Download the Excel file from Storage Account Container
+* Edit the sheet to create / update / delete locks. This takes a json value. You can put value in all 3 columns. Ex -
+```
+{
+    "name" : "MyLock",
+    "properties" : {
+        "level" : "ReadOnly",
+        "notes" : "My Read Only Lock"
+    }
+}
+```
+* Upload the Excel sheet in Storage Account Container named as **Update-<DATE>**. No spaces in filename allowed.
+
+### Run the Pipeline
+
+* Click on **Pipelines**
+* Select the Azure Locks Update Pipeline
+* Click **Run pipeline**
+* Select the Scope as Subscription / ResourceGroup / Resource.
+* Click on **Variable**
+* Provide the uploaded excel file name and <DATE> from above step.
+* Run the Pipeline.
+
+Note :: The Pipeline will upload the updated excel file with Audit sheet for changes in the same storage account container with folder named **Audit-<DATE>**
